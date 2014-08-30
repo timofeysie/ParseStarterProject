@@ -16,3 +16,14 @@ Choose “Templates” to create a template into which you can insert tags, whic
 Once you have a template, choose “New SMS” and you can then select the template to send.  The menu at the top let’s you choose the template.  You can then input values for the tags you created in that template.  Then, to finish, choose “Send SMS to contacts” and all the contacts in your list will be sent that message.
 
 This is just a demo project and is provided on an as-is basis.  See the ParseStarterProjectTest repository for JUnit test for the activities described here.
+
+This app was developed on a 64 bit installation of Fedora 19 Linux in Eclipse 4.3.1.
+The app has been run using the Eclipse Android Virtual Device with the following settings:
+```
+Device: Nexus S (4””, 480 x 800: hdpi)
+Target: Android 2.3.3 - API Level 10
+CPU/ABI: ARM (armeable)
+Keyboard: hardware present
+Memory Options: RAM 343, VM 32
+Internal Storage: 200 MiB
+```
