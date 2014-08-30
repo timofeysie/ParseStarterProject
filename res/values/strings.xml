@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Current status</string>
+    <string name="app_name">Friends</string>
+    <string name="submit">Submit</string>
+    <string name="data">data</string>
+    <string name="sync_contacts">Sync Contacts</string>
+    <string name="_contacts">" Contacts"</string>
+    <string name="templates">Templates</string>
+    <string name="title_activity_contacts">Contacts</string>
+    <string name="delete">Delete</string>
+    <string name="delete_contact">Delete this contact?</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="first_name">Given names</string>
+    <string name="last_name">Surname</string>
+    <string name="phone_number">Phone number</string>
+    <string name="add">Add</string>
+    <string name="sync_with_contacts">Sync</string>
+    <string name="status">Current Status: </string>
+    <string name="phone_contacts">Phone Contacts</string>
+    <string name="app_contacts">App Contacts</string>
+    <string name="_0">0</string>
+    <string name="title_activity_templates">Templates</string>
+    <string name="add_template_title">Add Template</string>
+    <string name="template_name_label">Template name</string>
+    <string name="template_body_label">Create template</string>
+    <string name="title_activity_add_template">Add Template</string>
+    <string name="back_button_label">Back</string>
+    <string name="done_button_label">Done</string>
+    <string name="location_button_label">Location</string>
+    <string name="date_button_label">Date</string>
+    <string name="time_button_label">Time</string>
+    <string name="text_button_label">Text</string>
+    <string name="signature_button_label">Signature</string>
+    <string name="location">location</string>
+    <string name="date">date</string>
+    <string name="time">time</string>
+    <string name="text">text</string>
+    <string name="signature">signature</string>
+    <string name="new_sms">New SMS</string>
+    <string name="send_new_sms_message">Send new SMS message</string>
+    <string name="friends">friends</string>
+    <string name="choose_your_template">Choose your template</string>
+    <string name="enter_value_">"Enter value: "</string>
+    <string name="send_finished_sms">Send finished SMS</string>
+    <string name="send_sms_to_phone_contacts">Send SMS to phone contacts</string>
+</resources>

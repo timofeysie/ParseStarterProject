@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/delete_contact_popup_text"
+        style="@style/Turn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/add_template_title" />
+
+    <TextView
+        android:id="@+id/template_name_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/template_name_label" />
+
+    <EditText
+        android:id="@+id/template_name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" android:inputType="text">
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/template_body_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/template_body_label" />
+
+    <EditText
+        android:id="@+id/template_body_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:ems="10" 
+        android:inputType="textMultiLine" >
+    </EditText>
+
+
+
+</LinearLayout>

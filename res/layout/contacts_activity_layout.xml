@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        style="@style/List"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:orientation="vertical" >
+
+        <TableLayout
+            android:id="@+id/contacts_table_layout"
+            style="@style/List"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0" >
+
+            <TableRow
+                android:id="@+id/TableRow01"
+                style="@style/List"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left" >
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/add_contact_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/contacts" android:contentDescription="@string/add_contact"/>
+
+</RelativeLayout>

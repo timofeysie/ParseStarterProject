@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/templates_spinner_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/choose_your_template" />
+
+        <Spinner
+            android:id="@+id/templates_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/templates_spinner_label" />
+
+        <EditText
+            android:id="@+id/send_sms_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:layout_below="@+id/templates_spinner"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="34dp"
+            android:ems="10"
+            android:inputType="textMultiLine" />
+
+        <ImageButton
+            android:id="@+id/send_finished_sms_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/send_sms" android:contentDescription="@string/send_finished_sms"/>
+
+        <TextView
+            android:id="@+id/send_finished_sms_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/send_finished_sms_image_button"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="17dp"
+            android:text="@string/send_sms_to_phone_contacts" />
+
+</RelativeLayout>
