@@ -16,6 +16,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -78,7 +79,7 @@ public class ParseStarterProjectActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 10m");
+		Log.i(DEBUG_TAG, "onCreate: 12");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
 		
@@ -353,14 +354,34 @@ public class ParseStarterProjectActivity extends Activity
 		contacts_sqlite_db.setLockingEnabled(true);
 		contacts_sqlite_db.setVersion(1);
 		boolean first_time = false;
-		if (!databaseExists((ContextWrapper) context, db_name))
-    	{
-			Log.i(DEBUG_TAG, method+": database doesn't exist.  Create tables.");
-			contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
-			contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
-			// if this is the user's first time, fill the app contacts with all the device contacts
-			first_time = true;
-    	}
+		try
+		{
+			tryQuery(app_contacts, first_time);
+		} catch (SQLiteException e){
+		    if (e.getMessage().toString().contains("no such table"))
+		    {
+	            Log.e(DEBUG_TAG, "Creating tables because they doesn't exist yet." );
+	            // create table
+	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
+				contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
+	            // re-run query, etc.
+				first_time = true;
+				tryQuery(app_contacts, first_time);
+		    }
+	    }
+		Log.i(DEBUG_TAG, method+": num_of_app_contacts "+num_of_app_contacts);
+	}
+	
+	/**
+	 * If this is the first time the app has been run this will cause an error.
+	 * Otherwise, we can get the curor to manage the contacts table.
+	 * @param app_contacts 
+	 * @param first_time if first time is true, then the users from the device contacts
+	 * will be add to the phone contacts.
+	 */
+	private void tryQuery(Map <String,String> app_contacts, boolean first_time)
+	{
+		String method = "tryQuery";
 		Cursor c = contacts_sqlite_db.query(contacts_table, null, null, null, null, null, null);
 		startManagingCursor(c);
 		Log.i(DEBUG_TAG, method+": count "+c.getCount()+" columns: "+c.getColumnCount());
@@ -378,21 +399,6 @@ public class ParseStarterProjectActivity extends Activity
 			Log.i(DEBUG_TAG, method+": row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
 			c.moveToNext();
 		}
-		Log.i(DEBUG_TAG, method+": num_of_app_contacts "+num_of_app_contacts);
-	}
-	
-	/**
-	 * * The path to the db should be:
-	 * /data/data/com/parse/starter/databases/contacts_sqlite.db
-	 * @param context A Context object can be passed in and is then cast to a ContextWrapper.
-	 * @param dbName The name of the database.
-	 * @return
-	 */
-	private static boolean databaseExists(ContextWrapper context, String dbName) 
-	{
-	    File database_file = context.getDatabasePath(dbName);
-	    Log.i(DEBUG_TAG, " db exists? "+database_file.exists());
-	    return database_file.exists();
 	}
 	
 	/**
