@@ -5,6 +5,18 @@ Parse cloud and sms template demo.
 
 ######Instructions for use
 
+To build ParseStarterProject, you must make sure you have the correct SDK libraries for the target listed in the AndroidManifest.xml file.
+The current settings are:
+```
+<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19"/>
+```
+On another system, targeting SDK 10, had to use these settings:
+```
+<uses-sdk android:minSdkVersion="10" android:targetSdkVersion="10"/>
+```
+
+You will also need to reset the directory to the android.jar file in the SDK on your system.  
+
 After installing the app and running it for the first time, you will see two indicators on the main screen:
 *  Device contacts
 *  App contacts
