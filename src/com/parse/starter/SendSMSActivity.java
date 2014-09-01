@@ -78,7 +78,7 @@ public class SendSMSActivity extends Activity
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.send_sms_activity_layout);
 	    final String method = "onCreate";
-	    Log.i(DEBUG_TAG, method+": build 6");
+	    Log.i(DEBUG_TAG, method+": build 7a");
 	    
 	    // Spinner
 	    setupDatabase();
@@ -100,7 +100,7 @@ public class SendSMSActivity extends Activity
         		getAppContacts();
         		sendMessages(message_to_send);
         		Log.i(DEBUG_TAG, method+".onClick: sent messages");
-        		Toast.makeText(context, "Sent to "+device_contacts.size()+" contacts.", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(context, "Sent to "+app_contacts.size()+" contacts.", Toast.LENGTH_SHORT).show();
         		finish();
             }
         });
@@ -112,7 +112,7 @@ public class SendSMSActivity extends Activity
 		for (Map.Entry<String, String> entry : app_contacts.entrySet())
 		{
 		    String name = entry.getKey();
-		    String number = device_contacts.get(name);
+		    String number = app_contacts.get(name);
 		    if (number.length()>0 && message_to_send.length()>0)  
 		    {
 		    	//SmsManager sms_manager = SmsManager.getDefault();
