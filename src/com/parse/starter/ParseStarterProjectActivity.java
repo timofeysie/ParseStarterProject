@@ -38,11 +38,11 @@ import com.parse.SaveCallback;
 /**
  * Main activity for the ParseStarterProject.
  * There are two type of contacts referred to in this app.
- * 1. Device contacts are those contained in the phones default contatcs database.
+ * 1. Device contacts are those contained in the phones default contacts database.
  * 2. App contacts are those contained in this app's database.
  * If a user chooses the sync function, any contacts that have been deleted in the device contacts will
- * also be deleted in the app contacts.  On the contrary, contacts deleted in the app contatcs will not
- * be deleted from the device contatcs.
+ * also be deleted in the app contacts.  On the contrary, contacts deleted in the app contacts will not
+ * be deleted from the device contacts.
  * @author timothy
  *
  */
@@ -79,7 +79,7 @@ public class ParseStarterProjectActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 12");
+		Log.i(DEBUG_TAG, "onCreate: 13j");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
 		
@@ -102,6 +102,7 @@ public class ParseStarterProjectActivity extends Activity
         {
             public void onClick(View v)
             {
+            	Log.i(DEBUG_TAG, "Sync ImageButton.onClick");
             	Map<String,String> app_contacts = new TreeMap<String,String>();
             	Map<String,String> device_contacts = new TreeMap<String,String>();
             	// 1 get app contacts
@@ -109,7 +110,9 @@ public class ParseStarterProjectActivity extends Activity
             	// if app contacts has a contact that device contacts doesn't,
             	// then remove that also from app contacts.
             	getAppContacts(app_contacts);
+            	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: app contacts: "+app_contacts.size());
             	getDeviceContacts(device_contacts);
+            	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: dev contacts: "+device_contacts.size());
             	syncContacts(app_contacts, device_contacts);
             }
         });
@@ -149,7 +152,7 @@ public class ParseStarterProjectActivity extends Activity
             			SendSMSActivity.class));
             }
         });
-     	
+ 
      	fetchParseData();
      	setupContactsCount();
 	}
@@ -162,8 +165,8 @@ public class ParseStarterProjectActivity extends Activity
 		num_of_phone_contacts = 0;
 		num_of_app_contacts = 0;
 		String method = "setupContactsCount()";
-		TreeMap<String,String> app_contacts = new TreeMap<String,String>();
-    	TreeMap<String,String> device_contacts = new TreeMap<String,String>();
+		Map<String,String> app_contacts = new TreeMap<String,String>();
+    	Map<String,String> device_contacts = new TreeMap<String,String>();
 		getAppContacts(app_contacts);
     	getDeviceContacts(device_contacts);
     	TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
@@ -184,7 +187,7 @@ public class ParseStarterProjectActivity extends Activity
 	 */
 	private void syncContacts(Map<String,String>app_contacts, Map<String,String>device_contacts)
 	{
-		TreeMap<String,String>app_contacts_to_remove = new TreeMap<String,String>();
+		Map<String,String>app_contacts_to_remove = new TreeMap<String,String>();
 		String removals = "";
 		String method = "synchContacts";
 		Iterator<Map.Entry<String,String>> iter = app_contacts.entrySet().iterator();
@@ -215,6 +218,43 @@ public class ParseStarterProjectActivity extends Activity
 			TextView app_contacts_count = (TextView)findViewById(R.id.app_contacts);
 			app_contacts_count.setText(Integer.toString(num_of_app_contacts));
 		}
+		if ((device_contacts.size() > 0) && (app_contacts.size() == 0))
+		{
+			// we should put all device contacts into the app contacts.
+			Log.i(DEBUG_TAG, method+": device contacts > 0 && app_contacts == 0, so add all device contacts.");
+			addAddDeviceContacts(device_contacts);
+			updateDeviceAndAppCounts();
+		}
+	}
+	
+	/**
+	 * Update the UI for the new count of app and device contacts.
+	 */
+	private void updateDeviceAndAppCounts()
+	{
+		TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
+    	TextView app_contacts_count = (TextView)findViewById(R.id.app_contacts);
+    	phone_contacts_count.setText(Integer.toString(num_of_phone_contacts));
+    	app_contacts_count.setText(Integer.toString(num_of_app_contacts));
+	}
+	
+	/**
+	 * This method will insert all the contacts in the device contacts into the
+	 * app contacts.
+	 * @param device_contacts Contacts to be inserted into the app contacts db.
+	 */
+	private void addAddDeviceContacts(Map<String,String>device_contacts)
+	{
+		num_of_app_contacts = 0;
+		String method = "addAddDeviceContacts";
+		for(String name: device_contacts.keySet())
+		{
+			String number = device_contacts.get(name);
+	        insertAppContact(name, number);
+	        num_of_app_contacts++;
+	        Log.i(DEBUG_TAG, method+": inserted "+name);
+	    }
+		num_of_phone_contacts = num_of_app_contacts;
 	}
 	
 	/**
@@ -238,13 +278,13 @@ public class ParseStarterProjectActivity extends Activity
         	{
         		String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
         		String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-        		Log.i(DEBUG_TAG, "readContacts: id "+id+" name "+name);
+        		//Log.i(DEBUG_TAG, "readContacts: id "+id+" name "+name);
         		if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) 
         		{
         			//Query phone #s, only add contacts with a phone number
         			getPhoneNumbers(id, device_contacts);
         			num_of_phone_contacts++;
-        			Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
+        			//Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
         		}
             }
         }
@@ -280,7 +320,7 @@ public class ParseStarterProjectActivity extends Activity
 	    {
 	        String name = dataCursor.getString(nameIdx);
 	        String number = dataCursor.getString(phoneIdx);
-	        Log.i(DEBUG_TAG, method+": "+name+" ("+number+")");
+	        //Log.i(DEBUG_TAG, method+": "+name+" ("+number+")");
 	        device_contacts.put(name,number);
 	    } 
 	    dataCursor.close();
@@ -364,7 +404,7 @@ public class ParseStarterProjectActivity extends Activity
 	            // create table
 	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
 				contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
-	            // re-run query, etc.
+	            // re-run query
 				first_time = true;
 				tryQuery(app_contacts, first_time);
 		    }
@@ -394,9 +434,10 @@ public class ParseStarterProjectActivity extends Activity
 			if (first_time)
 			{
 				insertAppContact(name, number);
+				Log.i(DEBUG_TAG, method+": first_time: insert row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
 			}
 			num_of_app_contacts++;
-			Log.i(DEBUG_TAG, method+": row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
+			//Log.i(DEBUG_TAG, method+": row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
 			c.moveToNext();
 		}
 	}

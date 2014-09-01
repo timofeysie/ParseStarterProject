@@ -109,30 +109,30 @@
             android:text="@string/phone_contacts" />
 
         <TextView
-            android:id="@+id/app_contacts_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/app_contacts"
-            android:layout_alignParentRight="true"
-            android:text="@string/app_contacts" />
-
-        <TextView
             android:id="@+id/phone_contacts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/app_contacts"
-            android:layout_alignBottom="@+id/app_contacts"
-            android:layout_alignLeft="@+id/templates_label"
-            android:layout_marginLeft="26dp"
+            android:layout_alignRight="@+id/sync_image_button"
+            android:layout_below="@+id/phone_contacts_label"
+            android:layout_marginRight="18dp"
             android:text="@string/_0" />
+
+        <TextView
+            android:id="@+id/app_contacts_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/phone_contacts"
+            android:layout_alignParentRight="true"
+            android:text="@string/app_contacts" />
 
         <TextView
             android:id="@+id/app_contacts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/sync_image_button"
-            android:layout_below="@+id/phone_contacts_label"
-            android:layout_marginRight="27dp"
+            android:layout_alignBaseline="@+id/phone_contacts"
+            android:layout_alignBottom="@+id/phone_contacts"
+            android:layout_alignLeft="@+id/templates_label"
+            android:layout_marginLeft="28dp"
             android:text="@string/_0" />
 
         <TextView
@@ -141,7 +141,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/templates_spinner_label"
             android:layout_alignBottom="@+id/templates_spinner_label"
-            android:layout_alignRight="@+id/app_contacts"
+            android:layout_toLeftOf="@+id/phone_contacts"
             android:text="@string/sync_with_contacts" />
 
         <TextView
