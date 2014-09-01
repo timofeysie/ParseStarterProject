@@ -11,12 +11,16 @@ import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
@@ -65,6 +69,7 @@ public class SendSMSActivity extends Activity
 	private Map<String,String> tags;
 	private String tag_fill;
 	private Map<String,String> device_contacts;
+	private Map <String,String> app_contacts;
 	
 	/** Setup the UI for sending an SMS. */
 	@Override
@@ -73,7 +78,7 @@ public class SendSMSActivity extends Activity
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.send_sms_activity_layout);
 	    final String method = "onCreate";
-	    Log.i(DEBUG_TAG, method+": build 3k");
+	    Log.i(DEBUG_TAG, method+": build 6");
 	    
 	    // Spinner
 	    setupDatabase();
@@ -90,8 +95,9 @@ public class SendSMSActivity extends Activity
             	// send the message
             	EditText send_sms_message_text = (EditText)findViewById(R.id.send_sms_message_text);
         		String message_to_send = send_sms_message_text.getText().toString();
-        		device_contacts = new TreeMap<String,String>();
-        		getDeviceContacts();
+        		//device_contacts = new TreeMap<String,String>();
+        		//getDeviceContacts();
+        		getAppContacts();
         		sendMessages(message_to_send);
         		Log.i(DEBUG_TAG, method+".onClick: sent messages");
         		Toast.makeText(context, "Sent to "+device_contacts.size()+" contacts.", Toast.LENGTH_SHORT).show();
@@ -102,19 +108,111 @@ public class SendSMSActivity extends Activity
 	
 	private void sendMessages(String message_to_send)
 	{
-		String method = "fillTags";
-		for (Map.Entry<String, String> entry : device_contacts.entrySet())
+		String method = "sendMessages";
+		for (Map.Entry<String, String> entry : app_contacts.entrySet())
 		{
 		    String name = entry.getKey();
 		    String number = device_contacts.get(name);
-		    SmsManager smsManager = SmsManager.getDefault();
-			smsManager.sendTextMessage(number, null, message_to_send, null, null);
-		    Log.i(DEBUG_TAG, method+": send message to "+name+"  "+number);
+		    if (number.length()>0 && message_to_send.length()>0)  
+		    {
+		    	//SmsManager sms_manager = SmsManager.getDefault();
+		    	//sms_Manager.sendTextMessage(number, null, message_to_send, null, null);
+		    	//ArrayList<String> parts = sms_manager.divideMessage(message_to_send);
+		    	//sendSMS(number.getText().toString(),parts );
+		    	//sms_manager.sendMultipartTextMessage(number, null,parts, null, null);
+		    	sendSMS(number,message_to_send);
+		    	Log.i(DEBUG_TAG, method+": send message to "+name+"  "+number);
+		    } else
+		    {
+		    	Log.i(DEBUG_TAG, method+": unable to send message to "+name+"  "+number);
+		    }
 		}
 	}
 	
+	private void sendSMS(String number, String message)
+    {      
+		final String method = "sendSMS";
+        String SENT = "SMS_SENT";
+        String DELIVERED = "SMS_DELIVERED";
+        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+        registerReceiver(new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context arg0, Intent arg1) 
+            {
+                switch (getResultCode())
+                {
+                    case Activity.RESULT_OK:
+                    	Log.i(DEBUG_TAG, method+"SMS sent");
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                    	Log.i(DEBUG_TAG, method+"Generic failure");
+                        break;
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                    	Log.i(DEBUG_TAG, method+"No service");
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                    	Log.i(DEBUG_TAG, method+"Null PDU");
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                    	Log.i(DEBUG_TAG, method+"Radio off");
+                        break;
+                }
+            }
+        }, new IntentFilter(SENT));
+        registerReceiver(new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context arg0, Intent arg1) 
+            {
+                switch (getResultCode())
+                {
+                    case Activity.RESULT_OK:
+                        Log.i(DEBUG_TAG, method+": SMS delivered");
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Log.i(DEBUG_TAG, method+": SMS not delivered");
+                        break;                      
+                }
+            }
+        }, new IntentFilter(DELIVERED));        
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(number, null, message, sentPI, deliveredPI);               
+    }   
+	
+	/**
+	 * Open the device sqlite database and load the contacts table.
+	 * If this is the first time, then create the database and tables.
+	 * Then add all the device contacts to the app contacts.
+	 */
+	private void getAppContacts()
+	{
+		app_contacts = new TreeMap <String,String>();
+		String method = "getAppContacts";
+		contacts_sqlite_db = context.openOrCreateDatabase(db_name
+				,SQLiteDatabase.CREATE_IF_NECESSARY, null);
+		contacts_sqlite_db.setLocale(Locale.getDefault());
+		contacts_sqlite_db.setLockingEnabled(true);
+		contacts_sqlite_db.setVersion(1);
+		Cursor c = contacts_sqlite_db.query(contacts_table, null, null, null, null, null, null);
+		startManagingCursor(c);
+		Log.i(DEBUG_TAG, method+": count "+c.getCount()+" columns: "+c.getColumnCount());
+		c.moveToFirst();
+		while (c.isAfterLast() == false)
+		{
+			String name = c.getString(1);
+			String number = c.getString(2);
+			app_contacts.put(name, number);
+			c.moveToNext();
+		}
+	}
+	
+	
 	/**
 	 * Query the Contacts to get a list of names and phone numbers.
+	 * We may need this if the user wants to choose to send it to different groups
+	 * @TODO prompt user for group to send message to.
 	 */
 	private void getDeviceContacts()
 	{
