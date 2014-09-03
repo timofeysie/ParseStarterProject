@@ -57,8 +57,8 @@ public class ContactsActivity extends Activity
 	public void onCreate(Bundle savedInstanceState) 
 	{
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.contacts_activity_layout);setContentView(R.layout.contacts_activity_layout);setContentView(R.layout.contacts_activity_layout);setContentView(R.layout.contacts_activity_layout);
-	    Log.i(DEBUG_TAG, "onCreate: 3d");
+	    setContentView(R.layout.contacts_activity_layout);
+	    Log.i(DEBUG_TAG, "onCreate: 4");
 	    // Add Contacts
      	ImageButton add_contact_button = (ImageButton) findViewById(R.id.add_contact_button);
      	add_contact_button.setOnClickListener(new OnClickListener()

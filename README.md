@@ -39,3 +39,19 @@ Keyboard: hardware present
 Memory Options: RAM 343, VM 32
 Internal Storage: 200 MiB
 ```
+
+
+##To do
+
+- create a list of groups:
+1. device contacts
+2. app contacts
+3. family
+4. friends
+5. aquaintences
+7. co-workers
+8. Group 8
+9. Group 9
+10. Group 10
+
+Let the user send a message vie template to a single contact from a group.

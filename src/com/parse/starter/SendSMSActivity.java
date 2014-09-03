@@ -71,6 +71,11 @@ public class SendSMSActivity extends Activity
 	private Map<String,String> device_contacts;
 	private Map <String,String> app_contacts;
 	
+	/** Gregory Blaxland 1778-1853, famous Autralian explorer and our
+	 * test user which will trigger the port number 555-4 for testing.*/
+	private static final String TEST_USER = "Gregory Blaxland";
+	private static final String TEST_NUMBER = "555-4";
+	
 	/** Setup the UI for sending an SMS. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -78,7 +83,7 @@ public class SendSMSActivity extends Activity
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.send_sms_activity_layout);
 	    final String method = "onCreate";
-	    Log.i(DEBUG_TAG, method+": build 7a");
+	    Log.i(DEBUG_TAG, method+": build 10b");
 	    
 	    // Spinner
 	    setupDatabase();
@@ -115,16 +120,26 @@ public class SendSMSActivity extends Activity
 		    String number = app_contacts.get(name);
 		    if (number.length()>0 && message_to_send.length()>0)  
 		    {
-		    	//SmsManager sms_manager = SmsManager.getDefault();
-		    	//sms_Manager.sendTextMessage(number, null, message_to_send, null, null);
-		    	//ArrayList<String> parts = sms_manager.divideMessage(message_to_send);
-		    	//sendSMS(number.getText().toString(),parts );
-		    	//sms_manager.sendMultipartTextMessage(number, null,parts, null, null);
-		    	sendSMS(number,message_to_send);
-		    	Log.i(DEBUG_TAG, method+": send message to "+name+"  "+number);
-		    } else
-		    {
-		    	Log.i(DEBUG_TAG, method+": unable to send message to "+name+"  "+number);
+		    	try
+		    	{
+		    		if (message_to_send.length()>160)
+		    		{
+		    			sendSMS(number, message_to_send, true) ;
+		    		} else
+		    		{
+		    			SmsManager sms_manager = SmsManager.getDefault();
+		    			if (name.equals(TEST_USER))
+		    			{
+		    				number = TEST_NUMBER;
+		    				Log.i(DEBUG_TAG, method+" using test user "+TEST_USER+" "+TEST_NUMBER);
+		    			}
+		    			sms_manager.sendTextMessage(number, null, message_to_send, null, null);
+		    		}
+		    	} catch (java.lang.NullPointerException npe)
+		    	{
+		    		Log.i(DEBUG_TAG, method+" NPE "+npe.toString());
+	        		Toast.makeText(context, "An exception has occured for "+name+"! \n"+npe.toString(), Toast.LENGTH_SHORT).show();
+		    	}
 		    }
 		}
 	}
@@ -181,6 +196,37 @@ public class SendSMSActivity extends Activity
         sms.sendTextMessage(number, null, message, sentPI, deliveredPI);               
     }   
 	
+	private void sendSMS(String number, String message, boolean split) 
+	{
+		final String method = "sendSMS";
+		String SENT = "SMS_SENT";
+        String DELIVERED = "SMS_DELIVERED";
+		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+	    PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+	    SmsManager sms = SmsManager.getDefault();
+	    if (!split) 
+	    {
+	    	Log.i(DEBUG_TAG, method+": SMSTest, Sending single message: " + message);
+	        sms.sendTextMessage(number, null, message, sentPI, deliveredPI);
+	    } else 
+	    {
+	    	Log.i(DEBUG_TAG, method+": SMSTest Sending '" + message + "' in multiple parts.");
+	        ArrayList<String> parts = sms.divideMessage(message);
+	        Log.i(DEBUG_TAG, method+": SMSTest "+parts.size() + " parts:");
+	        for (String string : parts) {
+	        	Log.i(DEBUG_TAG, method+": SMSTest "+string);
+	        }
+	        ArrayList<PendingIntent> sentList = new ArrayList<PendingIntent>();
+	        ArrayList<PendingIntent> deliveredList = new ArrayList<PendingIntent>();
+	        for (int i = 0; i < parts.size(); i++) {
+	            sentList.add(sentPI);
+	            deliveredList.add(deliveredPI);
+	        }
+	        sms.sendMultipartTextMessage(number, null, parts, sentList,
+	                deliveredList);
+	    }
+	}
+	
 	/**
 	 * Open the device sqlite database and load the contacts table.
 	 * If this is the first time, then create the database and tables.
@@ -204,6 +250,7 @@ public class SendSMSActivity extends Activity
 			String name = c.getString(1);
 			String number = c.getString(2);
 			app_contacts.put(name, number);
+			Log.i(DEBUG_TAG, method+": app_contacts.put "+name+" "+number);
 			c.moveToNext();
 		}
 	}
