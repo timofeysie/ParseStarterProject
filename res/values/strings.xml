@@ -44,4 +44,7 @@
     <string name="enter_value_">"Enter value: "</string>
     <string name="send_finished_sms">Send finished SMS</string>
     <string name="send_sms_to_phone_contacts">Send SMS to phone contacts</string>
+    <string name="title_activity_groups">Groups</string>
+    <string name="no_data">No data</string>
+    <string name="groups">Groups</string>
 </resources>

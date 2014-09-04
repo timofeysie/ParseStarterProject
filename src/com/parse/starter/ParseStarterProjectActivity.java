@@ -59,10 +59,11 @@ public class ParseStarterProjectActivity extends Activity
 	/** Database members */
 	private static final String db_name = "contacts_sqlite.db";
 	SQLiteDatabase contacts_sqlite_db;
-	private static final String CREATE_CONTACTS_TABLE = "CREATE TABLE tbl_contacts ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, number TEXT);";
-	private static final String CREATE_TEMPLATES_TABLE = "CREATE TABLE tbl_templates ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
+	private static final String CREATE_CONTACTS_TABLE = "CREATE TABLE tbl_contacts ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, number TEXT);";
+	private static final String CREATE_TEMPLATES_TABLE = "CREATE TABLE tbl_templates ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
 	
 	private static final String contacts_table = "tbl_contacts";
+	private static final String templates_table = "tbl_templates";
 	
 
 	private int num_of_phone_contacts = 0;
@@ -79,7 +80,7 @@ public class ParseStarterProjectActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 13j");
+		Log.i(DEBUG_TAG, "onCreate: 14");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
 		
@@ -150,6 +151,19 @@ public class ParseStarterProjectActivity extends Activity
             {
             	startActivity(new Intent(ParseStarterProjectActivity.this,
             			SendSMSActivity.class));
+            }
+        });
+
+     	
+     	// groups_image_button, groups_button_label
+     	ImageButton groups_image_button = (ImageButton) findViewById(R.id.groups_image_button);
+     	groups_image_button.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+            	startActivity(new Intent(ParseStarterProjectActivity.this,
+            			GroupsActivity.class));
             }
         });
  
@@ -393,6 +407,12 @@ public class ParseStarterProjectActivity extends Activity
 		contacts_sqlite_db.setLocale(Locale.getDefault());
 		contacts_sqlite_db.setLockingEnabled(true);
 		contacts_sqlite_db.setVersion(1);
+		/*** Un-comment to reset the db
+		contacts_sqlite_db.execSQL("DROP TABLE "+contacts_table);
+		contacts_sqlite_db.execSQL("DROP TABLE "+templates_table);
+		contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
+		contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
+		//***/
 		boolean first_time = false;
 		try
 		{

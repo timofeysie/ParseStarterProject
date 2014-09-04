@@ -56,6 +56,12 @@
             android:label="@string/send_new_sms_message">
         </activity>
         
+        <activity android:name="GroupsActivity"
+            android:label="@string/title_activity_groups">
+            
+        </activity>
+        
+        
         <!--  Push notification -->
         <service android:name="com.parse.PushService" />
 			<receiver android:name="com.parse.ParseBroadcastReceiver">

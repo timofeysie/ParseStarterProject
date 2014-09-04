@@ -61,6 +61,8 @@ public class ContactsActivity extends Activity
 	    Log.i(DEBUG_TAG, "onCreate: 4");
 	    // Add Contacts
      	ImageButton add_contact_button = (ImageButton) findViewById(R.id.add_contact_button);
+     // TODO, instead of applying an OnClickListener to the button in your in your Activity,
+     // it's better to assign a method to your button in the XML layout
      	add_contact_button.setOnClickListener(new OnClickListener()
         {
             @Override
@@ -69,6 +71,7 @@ public class ContactsActivity extends Activity
             	addContact();
             }
         });
+     	//TODO, this should be done by using MVP pattern, please reference the Android listView and Adapters
      	createAppContactsList();
 	}
 	/**

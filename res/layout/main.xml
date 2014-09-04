@@ -14,6 +14,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/friends_logo"
+            android:padding="10dp"
             android:src="@drawable/ic_launcher" android:contentDescription="@string/friends"/>
 
         <EditText
@@ -24,12 +25,14 @@
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@+id/friends_logo"
             android:ems="10"
+            android:padding="10dp"
             android:inputType="text" />
 
         <Button
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:text="@string/submit" />
 
         <TextView
@@ -37,6 +40,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/status_edit_text"
+            android:padding="10dp"
             android:text="@string/hello" />
 
     </RelativeLayout>
@@ -45,16 +49,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <TextView
-            android:id="@+id/templates_spinner_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/contacts_image_button"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="57dp"
-            android:contentDescription="@string/_contacts"
-            android:text="@string/_contacts" />
-
         <ImageButton
             android:id="@+id/sync_image_button"
             android:layout_width="wrap_content"
@@ -62,24 +56,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignTop="@+id/contacts_image_button"
             android:contentDescription="@string/sync_contacts"
+            android:padding="10dp"
             android:src="@drawable/sync" />
-
-        <ImageButton
-            android:id="@+id/new_sms_image_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="23dp"
-            android:contentDescription="@string/send_new_sms_message"
-            android:src="@drawable/send_sms" />
-
-        <TextView
-            android:id="@+id/new_sms_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/new_sms_image_button"
-            android:layout_centerHorizontal="true"
-            android:text="@string/new_sms" />
 
         <ImageButton
             android:id="@+id/templates_image_button"
@@ -88,16 +66,8 @@
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/contacts_image_button"
             android:contentDescription="@string/templates"
+            android:padding="10dp"
             android:src="@drawable/templates" />
-
-        <ImageButton
-            android:id="@+id/contacts_image_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/templates_spinner_label"
-            android:layout_alignLeft="@+id/new_sms_label"
-            android:contentDescription="@string/_contacts"
-            android:src="@drawable/contacts" />
 
         <TextView
             android:id="@+id/phone_contacts_label"
@@ -106,6 +76,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/new_sms_label"
             android:layout_marginTop="23dp"
+            android:padding="10dp"
             android:text="@string/phone_contacts" />
 
         <TextView
@@ -115,6 +86,7 @@
             android:layout_alignRight="@+id/sync_image_button"
             android:layout_below="@+id/phone_contacts_label"
             android:layout_marginRight="18dp"
+            android:padding="10dp"
             android:text="@string/_0" />
 
         <TextView
@@ -123,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/phone_contacts"
             android:layout_alignParentRight="true"
+            android:padding="10dp"
             android:text="@string/app_contacts" />
 
         <TextView
@@ -133,16 +106,8 @@
             android:layout_alignBottom="@+id/phone_contacts"
             android:layout_alignLeft="@+id/templates_label"
             android:layout_marginLeft="28dp"
+            android:padding="10dp"
             android:text="@string/_0" />
-
-        <TextView
-            android:id="@+id/sync_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/templates_spinner_label"
-            android:layout_alignBottom="@+id/templates_spinner_label"
-            android:layout_toLeftOf="@+id/phone_contacts"
-            android:text="@string/sync_with_contacts" />
 
         <TextView
             android:id="@+id/templates_label"
@@ -150,7 +115,78 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/templates_image_button"
+            android:padding="10dp"
             android:text="@string/templates" />
+
+        <ImageButton
+            android:id="@+id/new_sms_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="26dp"
+            android:contentDescription="@string/send_new_sms_message"
+            android:padding="10dp"
+            android:src="@drawable/send_sms" />
+
+        <TextView
+            android:id="@+id/new_sms_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/new_sms_image_button"
+            android:padding="10dp"
+            android:text="@string/new_sms" />
+
+        <TextView
+            android:id="@+id/groups_button_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/phone_contacts_label"
+            android:layout_alignLeft="@+id/templates_image_button"
+            android:padding="10dp"
+            android:text="@string/groups" />
+
+        <ImageButton
+            android:id="@+id/contacts_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/templates_spinner_label"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/_contacts"
+            android:padding="10dp"
+            android:src="@drawable/contacts" />
+
+        <ImageButton
+            android:id="@+id/groups_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/groups_button_label"
+            android:layout_alignRight="@+id/groups_button_label"
+            android:contentDescription="@string/groups"
+            android:padding="10dp"
+            android:src="@drawable/group" />
+
+        <TextView
+            android:id="@+id/sync_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/templates_spinner_label"
+            android:layout_alignBottom="@+id/templates_spinner_label"
+            android:layout_alignRight="@+id/sync_image_button"
+            android:padding="10dp"
+            android:text="@string/sync_with_contacts" />
+
+        <TextView
+            android:id="@+id/templates_spinner_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="57dp"
+            android:contentDescription="@string/_contacts"
+            android:padding="10dp"
+            android:text="@string/_contacts" />
 
     </RelativeLayout>
 
