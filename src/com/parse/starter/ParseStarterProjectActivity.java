@@ -80,95 +80,56 @@ public class ParseStarterProjectActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 14");
+		Log.i(DEBUG_TAG, "onCreate: 15d");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
-		
-		// Submit new status button
-		Button button = (Button)findViewById(R.id.submit_button);
-        button.setOnClickListener(new View.OnClickListener() 
-        {
-            public void onClick(View v)
-            {
-            	EditText status_edit_text = (EditText)findViewById(R.id.status_edit_text);
-            	foobie = status_edit_text.getText().toString().trim();
-            	updateStatusData();
-            	Log.i(DEBUG_TAG, "Button.onClick: "+foobie);
-            }
-        });
-        
-        // Sync with Contacts button
-        ImageButton sync_image_button = (ImageButton) findViewById(R.id.sync_image_button);
-     	sync_image_button.setOnClickListener(new View.OnClickListener() 
-        {
-            public void onClick(View v)
-            {
-            	Log.i(DEBUG_TAG, "Sync ImageButton.onClick");
-            	Map<String,String> app_contacts = new TreeMap<String,String>();
-            	Map<String,String> device_contacts = new TreeMap<String,String>();
-            	// 1 get app contacts
-            	// 2 get device contacts
-            	// if app contacts has a contact that device contacts doesn't,
-            	// then remove that also from app contacts.
-            	getAppContacts(app_contacts);
-            	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: app contacts: "+app_contacts.size());
-            	getDeviceContacts(device_contacts);
-            	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: dev contacts: "+device_contacts.size());
-            	syncContacts(app_contacts, device_contacts);
-            }
-        });
-     	
-     	// Contacts Button
-     	ImageButton contacts_image_button = (ImageButton) findViewById(R.id.contacts_image_button);
-     	contacts_image_button.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            	startActivity(new Intent(ParseStarterProjectActivity.this,
-                        ContactsActivity.class));
-            }
-        });
-     	
-        // Templates Button
-     	ImageButton templates_image_button = (ImageButton) findViewById(R.id.templates_image_button);
-     	templates_image_button.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            	startActivity(new Intent(ParseStarterProjectActivity.this,
-                        TemplatesActivity.class));
-            }
-        });
-     	
-     	// new_sms_image_button
-     	ImageButton new_sms_image_button = (ImageButton) findViewById(R.id.new_sms_image_button);
-     	new_sms_image_button.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            	startActivity(new Intent(ParseStarterProjectActivity.this,
-            			SendSMSActivity.class));
-            }
-        });
-
-     	
-     	// groups_image_button, groups_button_label
-     	ImageButton groups_image_button = (ImageButton) findViewById(R.id.groups_image_button);
-     	groups_image_button.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            	startActivity(new Intent(ParseStarterProjectActivity.this,
-            			GroupsActivity.class));
-            }
-        });
- 
+		setUpButtons();
      	fetchParseData();
      	setupContactsCount();
+	}
+	
+	/**
+	 * Set up the bottons so that they will respond to clicks in the execute method.
+	 */
+	@SuppressWarnings("unused")
+	private void setUpButtons()
+	{
+		// Submit new status button
+		Button status_submit_button = (Button)findViewById(R.id.status_submit_button);
+		ImageButton contacts_image_button = (ImageButton) findViewById(R.id.contacts_image_button);
+		ImageButton templates_image_button = (ImageButton) findViewById(R.id.templates_image_button);
+		ImageButton new_sms_image_button = (ImageButton) findViewById(R.id.new_sms_image_button);
+		ImageButton groups_image_button = (ImageButton) findViewById(R.id.groups_image_button);
+		ImageButton sync_image_button = (ImageButton) findViewById(R.id.sync_image_button);
+	}
+	
+	/**
+	 * Handle all button clicks here.
+	 * @param v
+	 */
+	public void execute(View v)
+	{
+		switch(v.getId())
+		{
+        case R.id.status_submit_button:
+        	updateStatusData();
+            break;
+        case R.id.sync_image_button:
+        	syncContacts();
+        	break;
+        case R.id.contacts_image_button:
+        	startActivity(new Intent(ParseStarterProjectActivity.this, ContactsActivity.class));
+        	break;
+        case R.id.templates_image_button:
+        	startActivity(new Intent(ParseStarterProjectActivity.this, TemplatesActivity.class));
+        	break;
+        case R.id.new_sms_image_button:
+        	startActivity(new Intent(ParseStarterProjectActivity.this, SendSMSActivity.class));
+        	break;
+        case R.id.groups_image_button:
+        	startActivity(new Intent(ParseStarterProjectActivity.this, GroupsActivity.class));
+        	break;
+		}
 	}
 	
 	/**
@@ -192,6 +153,8 @@ public class ParseStarterProjectActivity extends Activity
 	}
 	
 	/**
+	 * 1 get App contacts
+     * 2 get device contacts
 	 * Go thru all the phone contacts and if there are any that are in the app contacts which
 	 * are not in the phone contacts, then we will delete them also from the app contacts.
 	 * @param app_contacts (See device_contacts)
@@ -199,8 +162,14 @@ public class ParseStarterProjectActivity extends Activity
 	 * eliminate contacts that have been deleted from the device but not to app contacts
 	 * when the user does a sync function.
 	 */
-	private void syncContacts(Map<String,String>app_contacts, Map<String,String>device_contacts)
+	private void syncContacts()
 	{
+		Map<String,String> app_contacts = new TreeMap<String,String>();
+    	Map<String,String> device_contacts = new TreeMap<String,String>();
+    	getAppContacts(app_contacts);
+    	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: app contacts: "+app_contacts.size());
+    	getDeviceContacts(device_contacts);
+    	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: dev contacts: "+device_contacts.size());
 		Map<String,String>app_contacts_to_remove = new TreeMap<String,String>();
 		String removals = "";
 		String method = "synchContacts";
@@ -345,7 +314,7 @@ public class ParseStarterProjectActivity extends Activity
 	 */
 	private void updateGui()
 	{
-		TextView status_text_view_label = (TextView)findViewById(R.id.hello_text_view);
+		TextView status_text_view_label = (TextView)findViewById(R.id.status_text_view);
 		if (foobie.equals("barbie"))
 		{
 			foobie = "Available";
@@ -364,6 +333,8 @@ public class ParseStarterProjectActivity extends Activity
 	public void updateStatusData()
 	{
 		final String method = "updateStatusData";
+		EditText status_edit_text = (EditText)findViewById(R.id.status_edit_text);
+    	foobie = status_edit_text.getText().toString().trim();
 		ParseQuery<ParseObject> query = ParseQuery.getQuery(TEST_OBJECT);
 		query.getInBackground(TEST_ID, new GetCallback<ParseObject>() {
 		  public void done(ParseObject test_object, ParseException e) {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Current status</string>
+    <string name="status_text">Current status</string>
     <string name="app_name">Friends</string>
-    <string name="submit">Submit</string>
+    <string name="status_button_text">Change Status</string>
     <string name="data">data</string>
     <string name="sync_contacts">Sync Contacts</string>
     <string name="_contacts">" Contacts"</string>
