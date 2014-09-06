@@ -20,11 +20,14 @@ import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,15 +78,32 @@ public class ParseStarterProjectActivity extends Activity
 	private static final String TEST_OBJECT = "TestObject";
 	private static final String TEST_FIELD = "foobie";
 	
-	/** Called when the activity is first created. */
+	/** Set up listeners for buttons, Parse.com analytics, then fetch the current status
+	 * from Parse, then get the total counts of app and device contacts.*/
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 15d");
+		Log.i(DEBUG_TAG, "onCreate: 16a");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
 		setUpButtons();
+		
+		EditText edittext = (EditText) findViewById(R.id.status_edit_text);
+		edittext.setOnKeyListener(new OnKeyListener() 
+		{
+			@Override
+		    public boolean onKey(View v, int keyCode, KeyEvent event) 
+		    {
+		        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) 
+		        {
+		        	updateStatusData();
+		            return true;
+		        }
+		        return false;
+		    }
+		});
+		
      	fetchParseData();
      	setupContactsCount();
 	}
@@ -95,25 +115,27 @@ public class ParseStarterProjectActivity extends Activity
 	private void setUpButtons()
 	{
 		// Submit new status button
-		Button status_submit_button = (Button)findViewById(R.id.status_submit_button);
-		ImageButton contacts_image_button = (ImageButton) findViewById(R.id.contacts_image_button);
-		ImageButton templates_image_button = (ImageButton) findViewById(R.id.templates_image_button);
-		ImageButton new_sms_image_button = (ImageButton) findViewById(R.id.new_sms_image_button);
-		ImageButton groups_image_button = (ImageButton) findViewById(R.id.groups_image_button);
-		ImageButton sync_image_button = (ImageButton) findViewById(R.id.sync_image_button);
+		// Button status_submit_button = (Button)findViewById(R.id.status_submit_button);
+		ImageView contacts_image_button = (ImageView)findViewById(R.id.contacts_image_button);
+		ImageView templates_image_button = (ImageView)findViewById(R.id.templates_image_button);
+		ImageView new_sms_image_button = (ImageView)findViewById(R.id.new_sms_image_button);
+		ImageView groups_image_button = (ImageView)findViewById(R.id.groups_image_button);
+		ImageView sync_image_button = (ImageView)findViewById(R.id.sync_image_button);
 	}
 	
 	/**
 	 * Handle all button clicks here.
+	 * Replace:
+	 * case R.id.status_submit_button:
+        	updateStatusData();
+            break;
+     * With enter key listener.
 	 * @param v
 	 */
 	public void execute(View v)
 	{
 		switch(v.getId())
 		{
-        case R.id.status_submit_button:
-        	updateStatusData();
-            break;
         case R.id.sync_image_button:
         	syncContacts();
         	break;

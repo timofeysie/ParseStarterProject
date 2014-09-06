@@ -16,26 +16,25 @@
             android:layout_below="@+id/friends_logo"
             android:padding="10dp"
             android:src="@drawable/ic_launcher" android:contentDescription="@string/friends"/>
-        
-        <TextView
-            android:id="@+id/status_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/friends_logo"
-            android:padding="10dp"
-            android:text="@string/status_text" />
-        
+
         <EditText
             android:id="@+id/status_edit_text"
             android:layout_width="103dp"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:ems="10"
             android:inputType="text"
-            android:layout_toRightOf="@+id/status_text_view"
-            android:padding="10dp" >
-            <requestFocus />
-        </EditText>
+            android:padding="10dp" />
+
+        <TextView
+            android:id="@+id/status_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/status_edit_text"
+            android:layout_toRightOf="@+id/friends_logo"
+            android:padding="10dp"
+            android:text="@string/status_text" />
 
     </RelativeLayout>
 
@@ -43,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <ImageButton
+        <ImageView
             android:id="@+id/sync_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +53,7 @@
             android:onClick="execute"
             android:src="@drawable/sync" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/templates_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,25 +75,6 @@
             android:text="@string/phone_contacts" />
 
         <TextView
-            android:id="@+id/phone_contacts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/sync_image_button"
-            android:layout_below="@+id/phone_contacts_label"
-            android:layout_marginRight="18dp"
-            android:padding="10dp"
-            android:text="@string/_0" />
-
-        <TextView
-            android:id="@+id/app_contacts_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/phone_contacts"
-            android:layout_alignParentRight="true"
-            android:padding="10dp"
-            android:text="@string/app_contacts" />
-
-        <TextView
             android:id="@+id/app_contacts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -114,7 +94,7 @@
             android:padding="10dp"
             android:text="@string/templates" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/new_sms_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -126,25 +106,7 @@
             android:onClick="execute"
             android:src="@drawable/send_sms" />
 
-        <TextView
-            android:id="@+id/new_sms_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/new_sms_image_button"
-            android:padding="10dp"
-            android:text="@string/new_sms" />
-
-        <TextView
-            android:id="@+id/groups_button_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/phone_contacts_label"
-            android:layout_alignLeft="@+id/templates_image_button"
-            android:padding="10dp"
-            android:text="@string/groups" />
-
-        <ImageButton
+        <ImageView
             android:id="@+id/contacts_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -155,7 +117,7 @@
             android:onClick="execute"
             android:src="@drawable/contacts" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/groups_image_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -165,16 +127,6 @@
             android:padding="10dp"
             android:onClick="execute"
             android:src="@drawable/group" />
-
-        <TextView
-            android:id="@+id/sync_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/templates_spinner_label"
-            android:layout_alignBottom="@+id/templates_spinner_label"
-            android:layout_alignRight="@+id/sync_image_button"
-            android:padding="10dp"
-            android:text="@string/sync_with_contacts" />
 
         <TextView
             android:id="@+id/templates_spinner_label"
@@ -187,15 +139,51 @@
             android:padding="10dp"
             android:text="@string/_contacts" />
 
-        <Button
-            android:id="@+id/status_submit_button"
+        <TextView
+            android:id="@+id/new_sms_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/contacts_image_button"
-            android:layout_alignTop="@+id/groups_image_button"
-            android:onClick="execute"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/new_sms_image_button"
             android:padding="10dp"
-            android:text="@string/status_button_text" />
+            android:text="@string/new_sms" />
+
+        <TextView
+            android:id="@+id/sync_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/sync_image_button"
+            android:layout_below="@+id/sync_image_button"
+            android:padding="10dp"
+            android:text="@string/sync_with_contacts" />
+
+        <TextView
+            android:id="@+id/phone_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/sync_text_view"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:text="@string/_0" />
+
+        <TextView
+            android:id="@+id/app_contacts_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/phone_contacts_label"
+            android:layout_alignBottom="@+id/phone_contacts_label"
+            android:layout_alignRight="@+id/groups_button_label"
+            android:padding="10dp"
+            android:text="@string/app_contacts" />
+
+        <TextView
+            android:id="@+id/groups_button_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/templates_image_button"
+            android:layout_below="@+id/new_sms_image_button"
+            android:padding="10dp"
+            android:text="@string/groups" />
 
     </RelativeLayout>
 

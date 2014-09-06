@@ -36,33 +36,14 @@ public class GroupsActivity extends Activity
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.groups_activity_layout);
 	    String method = "onCreate";
-	    Log.i(DEBUG_TAG, method+": build 1g");
+	    Log.i(DEBUG_TAG, method+": build 2b");
 	    setupDatabase();
 	    String[] columns = {"_id","name"};
 		Cursor cursor = contacts_sqlite_db.query(contacts_table, null, null, null, null, null, null);
-		//Cursor cursor = contacts_sqlite_db.rawQuery("SELECT DISTINCT id as _id, name, number FROM tbl_contacts ORDER BY name", null);
 		Log.i(DEBUG_TAG, method+" count "+cursor.getCount());
-		//String[] fromColumns = {ContactsContract.Data.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER};
-	    //  create a string array specifying which columns from the Cursor you want in the layout 
-	    // for each result and an integer array specifying the corresponding views that each column should 
-	    // be placed:
-	    //int[] toViews = {R.id.display_name, R.id.phone_number};
-		//DataHelper dataHelper = new DataHelper(this);
-		//Cursor c = (Cursor) dataHelper.selectAll();
-		/*
-		ContentResolver cr = getContentResolver();
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        
-		GridView channel_selector_grid = (GridView) findViewById(R.id.channel_grid);
-		SimpleCursorAdapter sca = getGuideAdapter();
-	    channel_selector_grid.setAdapter(sca);
-		*/
-	    SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-	    		R.layout.groups_activity_layout, 
-	    		cursor, 
-	    		new String[] {ContactsContract.Contacts._ID, "name"}, 
-	    		new int[] { android.R.id.text1});
-		
+		String[] from = new String[] {"name"};
+		int[]  to = new int[] {R.id.itemTextView};
+		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,R.layout.groups_activity_layout, cursor, from, to);
 	    ListView listView = (ListView)findViewById(android.R.id.list);
 	    listView.setAdapter(adapter);
 	}
