@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="status_text">Current status</string>
-    <string name="app_name">Friends</string>
+    <string name="app_name">Myra\'s Friends</string>
     <string name="status_button_text">Change Status</string>
     <string name="data">data</string>
     <string name="sync_contacts">Sync Contacts</string>
@@ -47,4 +47,7 @@
     <string name="title_activity_groups">Groups</string>
     <string name="no_data">No data</string>
     <string name="groups">Groups</string>
+    <string name="reset_db">Reset App Contacts</string>
+    <string name="myra">Myra</string>
+    <string name="add_group">Add group</string>
 </resources>

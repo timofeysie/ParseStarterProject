@@ -1,8 +1,7 @@
 package com.parse.starter;
 
-import java.io.File;
-import java.util.Date;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -12,30 +11,32 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseException;
 import com.parse.SaveCallback;
 
 /**
@@ -58,17 +59,19 @@ public class ParseStarterProjectActivity extends Activity
 	private static final String CONTACT_OBJECT = "ContactObject";
 	private static final String CONTACT_NAME = "name";
 	private static final String CONTACT_PHONE = "number";
+	/** This activity only deals with the contacts table.*/
+	private static final String contacts_table = "tbl_contacts";
 	
 	/** Database members */
 	private static final String db_name = "contacts_sqlite.db";
 	SQLiteDatabase contacts_sqlite_db;
 	private static final String CREATE_CONTACTS_TABLE = "CREATE TABLE tbl_contacts ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, number TEXT);";
 	private static final String CREATE_TEMPLATES_TABLE = "CREATE TABLE tbl_templates ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
-	
-	private static final String contacts_table = "tbl_contacts";
-	private static final String templates_table = "tbl_templates";
-	
-
+	private static final String CREATE_GROUPS_TABLE = "CREATE TABLE tbl_groups ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
+	private static final String CREATE_CONTACTS_GROUPS_TABLE = 
+			"CREATE TABLE tbl_contacts_groups (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ "groups_id INTEGER NOT NULL CONSTRAINT groups_id REFERENCES tbl_groups(_id) ON DELETE CASCADE, "
+			+ "contacts_id INTEGER NOT NULL CONSTRAINT contacts_id REFERENCES tbl_contacts(_id) ON DELETE CASCADE)";
 	private int num_of_phone_contacts = 0;
 	private int num_of_app_contacts = 0;
 	
@@ -78,19 +81,23 @@ public class ParseStarterProjectActivity extends Activity
 	private static final String TEST_OBJECT = "TestObject";
 	private static final String TEST_FIELD = "foobie";
 	
+	// Menu items
+	private static final int reset_db_id = 2;
+    private static final int icon_group = 1;
+	
 	/** Set up listeners for buttons, Parse.com analytics, then fetch the current status
 	 * from Parse, then get the total counts of app and device contacts.*/
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 16a");
+		Log.i(DEBUG_TAG, "onCreate: 17h");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
 		setUpButtons();
 		
-		EditText edittext = (EditText) findViewById(R.id.status_edit_text);
-		edittext.setOnKeyListener(new OnKeyListener() 
+		EditText status_edit_text = (EditText) findViewById(R.id.status_edit_text);
+		status_edit_text.setOnKeyListener(new OnKeyListener() 
 		{
 			@Override
 		    public boolean onKey(View v, int keyCode, KeyEvent event) 
@@ -103,19 +110,54 @@ public class ParseStarterProjectActivity extends Activity
 		        return false;
 		    }
 		});
-		
+		new AsyncLoadContactsTask().execute("");
      	fetchParseData();
-     	setupContactsCount();
+     	setUpAppContactsCount();
 	}
 	
 	/**
-	 * Set up the bottons so that they will respond to clicks in the execute method.
+	 * Load phone contacts in background.
+	 * @author timothy
+	 *
+	 */
+	private class AsyncLoadContactsTask extends AsyncTask <String, String, String> 
+	{  
+		//private String debug = "YourCustomAsyncTask";
+        @Override  
+        protected void onPreExecute() 
+        {  
+            
+        }  
+
+        /**
+         * This method calls getDeviceContacts and then send the count to onPostExecute
+         * which will update the UI.
+         */
+        @Override  
+        protected String doInBackground(String ... String) 
+        {
+        	Map<String,String> device_contacts = new TreeMap<String,String>();
+        	getDeviceContacts(device_contacts);
+        	int number_of_phone_contacts = device_contacts.size();
+			return Integer.toString(number_of_phone_contacts);  
+        } 
+
+        @Override  
+        protected void onPostExecute(String device_contacts) 
+        {  
+        	String method = "onPostExecute";
+        	TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
+        	phone_contacts_count.setText(device_contacts);
+        	Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
+        }  
+	}
+	
+	/**
+	 * Set up the buttons so that they will respond to clicks in the execute method.
 	 */
 	@SuppressWarnings("unused")
 	private void setUpButtons()
 	{
-		// Submit new status button
-		// Button status_submit_button = (Button)findViewById(R.id.status_submit_button);
 		ImageView contacts_image_button = (ImageView)findViewById(R.id.contacts_image_button);
 		ImageView templates_image_button = (ImageView)findViewById(R.id.templates_image_button);
 		ImageView new_sms_image_button = (ImageView)findViewById(R.id.new_sms_image_button);
@@ -155,23 +197,23 @@ public class ParseStarterProjectActivity extends Activity
 	}
 	
 	/**
-	 * Set the number of device and app contacts in the contact labels.
+	 * Set the number of app contacts in the contact label.
 	 */
-	private void setupContactsCount()
+	private void setUpAppContactsCount()
 	{
 		num_of_phone_contacts = 0;
 		num_of_app_contacts = 0;
 		String method = "setupContactsCount()";
 		Map<String,String> app_contacts = new TreeMap<String,String>();
-    	Map<String,String> device_contacts = new TreeMap<String,String>();
+    	//Map<String,String> device_contacts = new TreeMap<String,String>();
 		getAppContacts(app_contacts);
-    	getDeviceContacts(device_contacts);
-    	TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
+    	//getDeviceContacts(device_contacts);
+    	//TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
     	TextView app_contacts_count = (TextView)findViewById(R.id.app_contacts);
-    	phone_contacts_count.setText(Integer.toString(num_of_phone_contacts));
+    	//phone_contacts_count.setText(Integer.toString(num_of_phone_contacts));
     	app_contacts_count.setText(Integer.toString(num_of_app_contacts));
     	Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
-    	Log.i(DEBUG_TAG, method+": num_of_app_contacts "+num_of_app_contacts);
+    	//Log.i(DEBUG_TAG, method+": num_of_app_contacts "+num_of_app_contacts);
 	}
 	
 	/**
@@ -400,12 +442,6 @@ public class ParseStarterProjectActivity extends Activity
 		contacts_sqlite_db.setLocale(Locale.getDefault());
 		contacts_sqlite_db.setLockingEnabled(true);
 		contacts_sqlite_db.setVersion(1);
-		/*** Un-comment to reset the db
-		contacts_sqlite_db.execSQL("DROP TABLE "+contacts_table);
-		contacts_sqlite_db.execSQL("DROP TABLE "+templates_table);
-		contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
-		contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
-		//***/
 		boolean first_time = false;
 		try
 		{
@@ -417,6 +453,8 @@ public class ParseStarterProjectActivity extends Activity
 	            // create table
 	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
 				contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
+				contacts_sqlite_db.execSQL(CREATE_GROUPS_TABLE);
+				contacts_sqlite_db.execSQL(CREATE_CONTACTS_GROUPS_TABLE);
 	            // re-run query
 				first_time = true;
 				tryQuery(app_contacts, first_time);
@@ -497,8 +535,55 @@ public class ParseStarterProjectActivity extends Activity
 	protected void onResume() 
 	{
 	    super.onResume();
-	    setupContactsCount();
+	    setUpAppContactsCount();
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+		super.onCreateOptionsMenu(menu);
+		menu.add(0 , reset_db_id, 0, R.string.reset_db);
+		return true;
+	}
+	
+	 public boolean onOptionsItemSelected(MenuItem item) 
+	 {
+	    String method = "onOptionsItemSelected";
+	    getIntent();
+	    if (item.getItemId() == reset_db_id)
+	    {
+	    	Log.i(DEBUG_TAG, method+": reset app db");
+	    	resetDB();
+	    }
+	    return super.onOptionsItemSelected(item);
+	 }
+	 
+	 private void resetDB()
+	 {
+		 String method = "resetDB";
+		 try
+		 {
+			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_contacts");
+			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_templates");
+			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_groups");
+			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_contacts_groups");
+		 } catch ( android.database.sqlite.SQLiteException sqle)
+		 {
+			 Log.i(DEBUG_TAG, method+": error with dropping tables ");
+			 sqle.printStackTrace();
+		 }
+		 try
+		 {
+			 contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
+			 contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
+			 contacts_sqlite_db.execSQL(CREATE_GROUPS_TABLE);
+			 contacts_sqlite_db.execSQL(CREATE_CONTACTS_GROUPS_TABLE);
+		 } catch ( android.database.sqlite.SQLiteException sqle)
+		 {
+			 Log.i(DEBUG_TAG, method+": error creating tables ");
+			 sqle.printStackTrace();
+		 }
+	 }
 	
 	// -------- UNUSED CODE -----------------------------------------------------
 	
