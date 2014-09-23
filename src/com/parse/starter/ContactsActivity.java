@@ -11,22 +11,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.Data;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TableLayout.LayoutParams;
 import android.widget.Toast;
+import static org.curchod.util.Tables.*;
 
 /**
  * Create a table of contacts.  The user can select a contact to delete.
@@ -39,14 +41,11 @@ public class ContactsActivity extends Activity
 	
 	final Context context = this;
 	private static final String DEBUG_TAG = "ContactsActivity";
-
-	/** Database members */
-	private static final String db_name = "contacts_sqlite.db";
-	SQLiteDatabase contacts_sqlite_db;
-	private static final String contacts_table = "tbl_contacts";
 	
 	/** Table to hold the list of contacts.*/
 	private TableLayout table;
+	
+	private SimpleCursorAdapter adapter;
 	
 	/** Setup the database and display the list of contacts.
 	 * The queryDatabase method calls setupRow() on each contact and 
@@ -58,21 +57,20 @@ public class ContactsActivity extends Activity
 	{
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.contacts_activity_layout);
-	    Log.i(DEBUG_TAG, "onCreate: 4");
-	    // Add Contacts
-     	ImageButton add_contact_button = (ImageButton) findViewById(R.id.add_contact_button);
-     // TODO, instead of applying an OnClickListener to the button in your in your Activity,
-     // it's better to assign a method to your button in the XML layout
-     	add_contact_button.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            	addContact();
-            }
-        });
-     	//TODO, this should be done by using MVP pattern, please reference the Android listView and Adapters
-     	createAppContactsList();
+	    Log.i(DEBUG_TAG, "onCreate: 5b");
+     	createAppContactsView();
+	}
+	
+	private void createAppContactsView()
+	{
+		String method = "createContactsView";
+		Cursor cursor = contacts_sqlite_db.query(contacts_table, null, null, null, null, null, null);
+		Log.i(DEBUG_TAG, method+" count "+cursor.getCount());
+		String[] from = new String[] {"name"};
+		int[]  to = new int[] {R.id.itemTextView};
+     	adapter = new SimpleCursorAdapter(this,R.layout.contacts_activity_layout, cursor, from, to);
+	    ListView listView = (ListView)findViewById(android.R.id.list);
+	    listView.setAdapter(adapter);
 	}
 	/**
 	 * Throw up a dialog to get first name, last name and phone number.
@@ -98,7 +96,6 @@ public class ContactsActivity extends Activity
 				    Log.i(DEBUG_TAG, method+": "+name+" "+number);
 				    addDeviceContact(name, number);
 				    addAppContact(name, number);
-				    setupRow(name, number);
 			    }
 			  }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() 
 			  {
@@ -168,6 +165,7 @@ public class ContactsActivity extends Activity
 		contact.put("number", number);
 		long new_id = contacts_sqlite_db.insert("tbl_contacts",  null,  contact);
 		Log.i(DEBUG_TAG, method+": new id "+new_id);
+		adapter.getCursor().requery();
 	}
 	
 	/**
@@ -209,88 +207,37 @@ public class ContactsActivity extends Activity
     	alert_dialog.show();
 	}
 	
-	/**
-	 * Create a table layout programmatically and add an on click listener.
-	 * The table has two rows, for name and phone number.
-	 * When a user selects a contact, selectedContact() will prompt the user to delete
-	 * the contact or cancel the operation.
-	 */
-	private void setupRow(String name, String number)
-	{
-		final String method = "setupRow";
-		table = (TableLayout) findViewById(R.id.contacts_table_layout);
-		table.setVerticalScrollBarEnabled(true);
-		table.setColumnStretchable(2, true);
-		TableRow row = new TableRow(this);
-		TextView name_text_view = new TextView(this);
-        TextView number_text_view = new TextView(this);   
-        name_text_view.setText(name);
-        number_text_view.setText(number);
-        row.addView(name_text_view);
-        row.addView(number_text_view);
-        table.addView(row,new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        row.setClickable(true);
-        row.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            	String inner_method = "onClick";
-            	final String method = "setupRow.onClick";
-            	String selected_row_id = v.toString();
-            	TableRow t = (TableRow)v;
-                TextView firstTextView = (TextView) t.getChildAt(0);
-                TextView secondTextView = (TextView) t.getChildAt(1);
-                String name = firstTextView.getText().toString();
-                String number = secondTextView.getText().toString();
-            	Log.i(DEBUG_TAG, method+"."+inner_method+" row_id "+selected_row_id+" "+name+" "+number);
-            	selectedContact(name, number, v);
-            }
-        });
-	}
-	
-	/**
-	 * Set up the database and place it under management,addContact
-	 * then call getContacts() to get the contacts table and show it.
-	 */
-	private void createAppContactsList()
-	{
-		setupDatabase();
-		// table, columns, selection, selectionArgs, groupBy, having, orderBy
-		Cursor c = contacts_sqlite_db.query(contacts_table, null, null, null, null, null, null);
-		startManagingCursor(c);
-		getAppContacts(c);
-	}
-	
-	private void getAppContacts(Cursor c)
-	{
-		String method = "getAppContacts";
-		Log.i(DEBUG_TAG, method+": count "+c.getCount()+" columns: "+c.getColumnCount());
-		c.moveToFirst();
-		while (c.isAfterLast() == false)
-		{
-			String name = c.getString(1);
-			String number = c.getString(2);
-			setupRow(name, number);
-			Log.i(DEBUG_TAG, method+": row "+c.getPosition()+": "+name+" "+number);
-			c.moveToNext();
-		}
-	}
-	
-	private void setupDatabase()
-	{
-	    contacts_sqlite_db = context.openOrCreateDatabase(db_name
-				,SQLiteDatabase.CREATE_IF_NECESSARY, null);
-		contacts_sqlite_db.setLocale(Locale.getDefault());
-		contacts_sqlite_db.setLockingEnabled(true);
-		contacts_sqlite_db.setVersion(1);
-	}
-	
 	@Override
     public void onDestroy()
 	{
         super.onDestroy();
         contacts_sqlite_db.close();
     }
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+		super.onCreateOptionsMenu(menu);
+		menu.add(0 , 1, 0, R.string.add_contact);
+		return true;
+	}
+	
+	 public boolean onOptionsItemSelected(MenuItem item) 
+	 {
+	    String method = "onOptionsItemSelected";
+	    getIntent();
+	    if (item.getItemId() == 1)
+	    {
+	    	Log.i(DEBUG_TAG, method+": Add Contacts");
+	    	addContact();
+	    }
+	    return super.onOptionsItemSelected(item);
+	 }
+	 
+	public void execute(View v)
+	{
+			String method = "execute";
+			Log.i(DEBUG_TAG, method+": selected "+v.getId());
+	}
 
 }

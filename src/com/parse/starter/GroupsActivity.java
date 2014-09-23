@@ -9,9 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,17 +19,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import static org.curchod.util.Tables.*;
+
 public class GroupsActivity extends Activity 
 {
 
 	final Context context = this;
 	private static final String DEBUG_TAG = "GroupsActivity";
-	
-	/** Database members */
-	private static final String db_name = "contacts_sqlite.db";
-	SQLiteDatabase contacts_sqlite_db;
-	private static final String groups_table = "tbl_groups";
-	private static final String contacts_groups_table = "tbl_contacts_groups";
 	
 	private static final int add_group_id = 2;
 	private String new_group_name;

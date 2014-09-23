@@ -1,5 +1,13 @@
 package com.parse.starter;
 
+import static org.curchod.util.Tables.CREATE_CONTACTS_GROUPS_TABLE;
+import static org.curchod.util.Tables.CREATE_CONTACTS_TABLE;
+import static org.curchod.util.Tables.CREATE_GROUPS_TABLE;
+import static org.curchod.util.Tables.CREATE_TEMPLATES_TABLE;
+import static org.curchod.util.Tables.contacts_sqlite_db;
+import static org.curchod.util.Tables.contacts_table;
+import static org.curchod.util.Tables.db_name;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -15,8 +23,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -24,7 +30,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.widget.EditText;
@@ -59,19 +64,7 @@ public class ParseStarterProjectActivity extends Activity
 	private static final String CONTACT_OBJECT = "ContactObject";
 	private static final String CONTACT_NAME = "name";
 	private static final String CONTACT_PHONE = "number";
-	/** This activity only deals with the contacts table.*/
-	private static final String contacts_table = "tbl_contacts";
 	
-	/** Database members */
-	private static final String db_name = "contacts_sqlite.db";
-	SQLiteDatabase contacts_sqlite_db;
-	private static final String CREATE_CONTACTS_TABLE = "CREATE TABLE tbl_contacts ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, number TEXT);";
-	private static final String CREATE_TEMPLATES_TABLE = "CREATE TABLE tbl_templates ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
-	private static final String CREATE_GROUPS_TABLE = "CREATE TABLE tbl_groups ( _id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
-	private static final String CREATE_CONTACTS_GROUPS_TABLE = 
-			"CREATE TABLE tbl_contacts_groups (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ "groups_id INTEGER NOT NULL CONSTRAINT groups_id REFERENCES tbl_groups(_id) ON DELETE CASCADE, "
-			+ "contacts_id INTEGER NOT NULL CONSTRAINT contacts_id REFERENCES tbl_contacts(_id) ON DELETE CASCADE)";
 	private int num_of_phone_contacts = 0;
 	private int num_of_app_contacts = 0;
 	
@@ -91,7 +84,7 @@ public class ParseStarterProjectActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Log.i(DEBUG_TAG, "onCreate: 17h");
+		Log.i(DEBUG_TAG, "onCreate: 18");
 		// Track statistics around application opens
 		ParseAnalytics.trackAppOpened(getIntent());
 		setUpButtons();
@@ -452,9 +445,9 @@ public class ParseStarterProjectActivity extends Activity
 	            Log.e(DEBUG_TAG, "Creating tables because they doesn't exist yet." );
 	            // create table
 	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
-				contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
-				contacts_sqlite_db.execSQL(CREATE_GROUPS_TABLE);
-				contacts_sqlite_db.execSQL(CREATE_CONTACTS_GROUPS_TABLE);
+	            contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
+	            contacts_sqlite_db.execSQL(CREATE_GROUPS_TABLE);
+	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_GROUPS_TABLE);
 	            // re-run query
 				first_time = true;
 				tryQuery(app_contacts, first_time);
