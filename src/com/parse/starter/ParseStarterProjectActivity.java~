@@ -1,59 +1,48 @@
 package com.parse.starter;
 
-import static org.curchod.util.Tables.CREATE_CONTACTS_GROUPS_TABLE;
-import static org.curchod.util.Tables.CREATE_CONTACTS_TABLE;
-import static org.curchod.util.Tables.CREATE_GROUPS_TABLE;
-import static org.curchod.util.Tables.CREATE_TEMPLATES_TABLE;
-import static org.curchod.util.Tables.contacts_sqlite_db;
-import static org.curchod.util.Tables.contacts_table;
-import static org.curchod.util.Tables.db_name;
-
-import java.util.Arrays;
+import java.io.File;
 import java.util.Date;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.curchod.util.IconAdapter;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
-import com.parse.ParseException;
+import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseException;
 import com.parse.SaveCallback;
 
 /**
  * Main activity for the ParseStarterProject.
  * There are two type of contacts referred to in this app.
- * 1. Device contacts are those contained in the phones default contacts database.
+ * 1. Device contacts are those contained in the phones default contatcs database.
  * 2. App contacts are those contained in this app's database.
  * If a user chooses the sync function, any contacts that have been deleted in the device contacts will
- * also be deleted in the app contacts.  On the contrary, contacts deleted in the app contacts will not
- * be deleted from the device contacts.
+ * also be deleted in the app contacts.  On the contrary, contacts deleted in the app contatcs will not
+ * be deleted from the device contatcs.
  * @author timothy
  *
  */
@@ -67,6 +56,15 @@ public class ParseStarterProjectActivity extends Activity
 	private static final String CONTACT_NAME = "name";
 	private static final String CONTACT_PHONE = "number";
 	
+	/** Database members */
+	private static final String db_name = "contacts_sqlite.db";
+	SQLiteDatabase contacts_sqlite_db;
+	private static final String CREATE_CONTACTS_TABLE = "CREATE TABLE tbl_contacts ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, number TEXT);";
+	private static final String CREATE_TEMPLATES_TABLE = "CREATE TABLE tbl_templates ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, template TEXT);";
+	
+	private static final String contacts_table = "tbl_contacts";
+	
+
 	private int num_of_phone_contacts = 0;
 	private int num_of_app_contacts = 0;
 	
@@ -76,187 +74,107 @@ public class ParseStarterProjectActivity extends Activity
 	private static final String TEST_OBJECT = "TestObject";
 	private static final String TEST_FIELD = "foobie";
 	
-	// Menu items
-	private static final int reset_db_id = 2;
-    private static final int icon_group = 1;
-    private static final int sync_button = 0;
-    private static final int template_button = 1;
-    private static final int send_button = 2;
-    private static final int contacts_button = 3;
-    private static final int groups_button = 4;
-    
-	
-	/** Set up listeners for buttons, Parse.com analytics, then fetch the current status
-	 * from Parse, then get the total counts of app and device contacts.*/
+	/** Called when the activity is first created. */
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_grid_layout);
-		Log.i(DEBUG_TAG, "onCreate: 21j");
-		
-		GridView gridview = (GridView) findViewById(R.id.grid_view);
-	    gridview.setAdapter(new IconAdapter(this));
-	    
-	    gridview.setOnItemClickListener(new OnItemClickListener() {
-	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	Log.i(DEBUG_TAG, "onCreate: " + position);
-	        	switch (position) {
-	        	case sync_button:
-	        		Log.i(DEBUG_TAG, "switch: sync");
-	        		syncContacts();
-	        		break;
-	        	case template_button:
-	        		Log.i(DEBUG_TAG, "switch: templates");
-	        		startActivity(new Intent(ParseStarterProjectActivity.this, TemplatesActivity.class));
-	        		break;
-	        	case send_button:
-	        		Log.i(DEBUG_TAG, "switch: send");
-	        		startActivity(new Intent(ParseStarterProjectActivity.this, SendSMSActivity.class));
-	        		break;
-	        	case contacts_button:
-	        		Log.i(DEBUG_TAG, "switch: contacts");
-	        		startActivity(new Intent(ParseStarterProjectActivity.this, ContactsActivity.class));
-	        		break;
-	        	case groups_button:
-	        		Log.i(DEBUG_TAG, "switch: groups");
-	        		startActivity(new Intent(ParseStarterProjectActivity.this, GroupsActivity.class));
-	        		break;
-	        	}
-	        		
-	        }
-	    });
-	    
+		setContentView(R.layout.main);
+		Log.i(DEBUG_TAG, "onCreate: 12");
 		// Track statistics around application opens
-		//ParseAnalytics.trackAppOpened(getIntent());
-		//setUpButtons();
+		ParseAnalytics.trackAppOpened(getIntent());
 		
-		/*
-		ImageView status_edit_text = (ImageView) findViewById(R.id.status_edit_text);
-		status_edit_text.setOnKeyListener(new OnKeyListener() 
-		{
-			@Override
-		    public boolean onKey(View v, int keyCode, KeyEvent event) 
-		    {
-		        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) 
-		        {
-		        	updateStatusData();
-		            return true;
-		        }
-		        return false;
-		    }
-		});*/
-		//new AsyncLoadContactsTask().execute("");
-     	//fetchParseData();
-     	//setUpAppContactsCount();
-	}
-	
-	/**
-	 * Load phone contacts in background.
-	 * @author timothy
-	 *
-	 */
-	private class AsyncLoadContactsTask extends AsyncTask <String, String, String> 
-	{  
-		//private String debug = "YourCustomAsyncTask";
-        @Override  
-        protected void onPreExecute() 
-        {  
-            
-        }  
-
-        /**
-         * This method calls getDeviceContacts and then send the count to onPostExecute
-         * which will update the UI.
-         */
-        @Override  
-        protected String doInBackground(String ... String) 
+		// Submit new status button
+		Button button = (Button)findViewById(R.id.submit_button);
+        button.setOnClickListener(new View.OnClickListener() 
         {
-        	Map<String,String> device_contacts = new TreeMap<String,String>();
-        	getDeviceContacts(device_contacts);
-        	int number_of_phone_contacts = device_contacts.size();
-			return Integer.toString(number_of_phone_contacts);  
-        } 
-
-        @Override  
-        protected void onPostExecute(String device_contacts) 
-        {  
-        	String method = "onPostExecute";
-        	TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
-        	phone_contacts_count.setText(device_contacts);
-        	Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
-        }  
+            public void onClick(View v)
+            {
+            	EditText status_edit_text = (EditText)findViewById(R.id.status_edit_text);
+            	foobie = status_edit_text.getText().toString().trim();
+            	updateStatusData();
+            	Log.i(DEBUG_TAG, "Button.onClick: "+foobie);
+            }
+        });
+        
+        // Sync with Contacts button
+        ImageButton sync_image_button = (ImageButton) findViewById(R.id.sync_image_button);
+     	sync_image_button.setOnClickListener(new View.OnClickListener() 
+        {
+            public void onClick(View v)
+            {
+            	Map<String,String> app_contacts = new TreeMap<String,String>();
+            	Map<String,String> device_contacts = new TreeMap<String,String>();
+            	// 1 get app contacts
+            	// 2 get device contacts
+            	// if app contacts has a contact that device contacts doesn't,
+            	// then remove that also from app contacts.
+            	getAppContacts(app_contacts);
+            	getDeviceContacts(device_contacts);
+            	syncContacts(app_contacts, device_contacts);
+            }
+        });
+     	
+     	// Contacts Button
+     	ImageButton contacts_image_button = (ImageButton) findViewById(R.id.contacts_image_button);
+     	contacts_image_button.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+            	startActivity(new Intent(ParseStarterProjectActivity.this,
+                        ContactsActivity.class));
+            }
+        });
+     	
+        // Templates Button
+     	ImageButton templates_image_button = (ImageButton) findViewById(R.id.templates_image_button);
+     	templates_image_button.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+            	startActivity(new Intent(ParseStarterProjectActivity.this,
+                        TemplatesActivity.class));
+            }
+        });
+     	
+     	// new_sms_image_button
+     	ImageButton new_sms_image_button = (ImageButton) findViewById(R.id.new_sms_image_button);
+     	new_sms_image_button.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+            	startActivity(new Intent(ParseStarterProjectActivity.this,
+            			SendSMSActivity.class));
+            }
+        });
+     	
+     	fetchParseData();
+     	setupContactsCount();
 	}
 	
 	/**
-	 * Set up the buttons so that they will respond to clicks in the execute method.
+	 * Set the number of device and app contacts in the contact labels.
 	 */
-	@SuppressWarnings("unused")
-	private void setUpButtons()
-	{
-		ImageView contacts_image_button = (ImageView)findViewById(R.id.contacts_image_button);
-		ImageView templates_image_button = (ImageView)findViewById(R.id.templates_image_button);
-		ImageView new_sms_image_button = (ImageView)findViewById(R.id.new_sms_image_button);
-		ImageView groups_image_button = (ImageView)findViewById(R.id.groups_image_button);
-		ImageView sync_image_button = (ImageView)findViewById(R.id.sync_image_button);
-	}
-	
-	/**
-	 * Handle all button clicks here.
-	 * Replace:
-	 * case R.id.status_submit_button:
-        	updateStatusData();
-            break;
-     * With enter key listener.
-	 * @param v
-	 */
-	public void execute(View v)
-	{
-		String method = "execute";
-		Log.i(DEBUG_TAG, method+": view "+v.getId());
-		Log.i(DEBUG_TAG, method+": content "+v.getContext().toString());
-		switch(v.getId())
-		{
-        case R.id.sync_image_button:
-        	syncContacts();
-        	break;
-        case R.id.contacts_image_button:
-        	startActivity(new Intent(ParseStarterProjectActivity.this, ContactsActivity.class));
-        	break;
-        case R.id.templates_image_button:
-        	startActivity(new Intent(ParseStarterProjectActivity.this, TemplatesActivity.class));
-        	break;
-        case R.id.new_sms_image_button:
-        	startActivity(new Intent(ParseStarterProjectActivity.this, SendSMSActivity.class));
-        	break;
-        case R.id.groups_image_button:
-        	startActivity(new Intent(ParseStarterProjectActivity.this, GroupsActivity.class));
-        	break;
-		}
-	}
-	
-	/**
-	 * Set the number of app contacts in the contact label.
-	 */
-	private void setUpAppContactsCount()
+	private void setupContactsCount()
 	{
 		num_of_phone_contacts = 0;
 		num_of_app_contacts = 0;
 		String method = "setupContactsCount()";
-		Map<String,String> app_contacts = new TreeMap<String,String>();
-    	//Map<String,String> device_contacts = new TreeMap<String,String>();
+		TreeMap<String,String> app_contacts = new TreeMap<String,String>();
+    	TreeMap<String,String> device_contacts = new TreeMap<String,String>();
 		getAppContacts(app_contacts);
-    	//getDeviceContacts(device_contacts);
-    	//TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
+    	getDeviceContacts(device_contacts);
+    	TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
     	TextView app_contacts_count = (TextView)findViewById(R.id.app_contacts);
-    	//phone_contacts_count.setText(Integer.toString(num_of_phone_contacts));
+    	phone_contacts_count.setText(Integer.toString(num_of_phone_contacts));
     	app_contacts_count.setText(Integer.toString(num_of_app_contacts));
     	Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
-    	//Log.i(DEBUG_TAG, method+": num_of_app_contacts "+num_of_app_contacts);
+    	Log.i(DEBUG_TAG, method+": num_of_app_contacts "+num_of_app_contacts);
 	}
 	
 	/**
-	 * 1 get App contacts
-     * 2 get device contacts
 	 * Go thru all the phone contacts and if there are any that are in the app contacts which
 	 * are not in the phone contacts, then we will delete them also from the app contacts.
 	 * @param app_contacts (See device_contacts)
@@ -264,15 +182,9 @@ public class ParseStarterProjectActivity extends Activity
 	 * eliminate contacts that have been deleted from the device but not to app contacts
 	 * when the user does a sync function.
 	 */
-	private void syncContacts()
+	private void syncContacts(Map<String,String>app_contacts, Map<String,String>device_contacts)
 	{
-		Map<String,String> app_contacts = new TreeMap<String,String>();
-    	Map<String,String> device_contacts = new TreeMap<String,String>();
-    	getAppContacts(app_contacts);
-    	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: app contacts: "+app_contacts.size());
-    	getDeviceContacts(device_contacts);
-    	Log.i(DEBUG_TAG, "Sync ImageButton.onClick: dev contacts: "+device_contacts.size());
-		Map<String,String>app_contacts_to_remove = new TreeMap<String,String>();
+		TreeMap<String,String>app_contacts_to_remove = new TreeMap<String,String>();
 		String removals = "";
 		String method = "synchContacts";
 		Iterator<Map.Entry<String,String>> iter = app_contacts.entrySet().iterator();
@@ -303,43 +215,6 @@ public class ParseStarterProjectActivity extends Activity
 			TextView app_contacts_count = (TextView)findViewById(R.id.app_contacts);
 			app_contacts_count.setText(Integer.toString(num_of_app_contacts));
 		}
-		if ((device_contacts.size() > 0) && (app_contacts.size() == 0))
-		{
-			// we should put all device contacts into the app contacts.
-			Log.i(DEBUG_TAG, method+": device contacts > 0 && app_contacts == 0, so add all device contacts.");
-			addAddDeviceContacts(device_contacts);
-			updateDeviceAndAppCounts();
-		}
-	}
-	
-	/**
-	 * Update the UI for the new count of app and device contacts.
-	 */
-	private void updateDeviceAndAppCounts()
-	{
-		TextView phone_contacts_count = (TextView)findViewById(R.id.phone_contacts);
-    	TextView app_contacts_count = (TextView)findViewById(R.id.app_contacts);
-    	phone_contacts_count.setText(Integer.toString(num_of_phone_contacts));
-    	app_contacts_count.setText(Integer.toString(num_of_app_contacts));
-	}
-	
-	/**
-	 * This method will insert all the contacts in the device contacts into the
-	 * app contacts.
-	 * @param device_contacts Contacts to be inserted into the app contacts db.
-	 */
-	private void addAddDeviceContacts(Map<String,String>device_contacts)
-	{
-		num_of_app_contacts = 0;
-		String method = "addAddDeviceContacts";
-		for(String name: device_contacts.keySet())
-		{
-			String number = device_contacts.get(name);
-	        insertAppContact(name, number);
-	        num_of_app_contacts++;
-	        Log.i(DEBUG_TAG, method+": inserted "+name);
-	    }
-		num_of_phone_contacts = num_of_app_contacts;
 	}
 	
 	/**
@@ -363,13 +238,13 @@ public class ParseStarterProjectActivity extends Activity
         	{
         		String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
         		String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-        		//Log.i(DEBUG_TAG, "readContacts: id "+id+" name "+name);
+        		Log.i(DEBUG_TAG, "readContacts: id "+id+" name "+name);
         		if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) 
         		{
         			//Query phone #s, only add contacts with a phone number
         			getPhoneNumbers(id, device_contacts);
         			num_of_phone_contacts++;
-        			//Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
+        			Log.i(DEBUG_TAG, method+": num_of_phone_contacts "+num_of_phone_contacts);
         		}
             }
         }
@@ -405,7 +280,7 @@ public class ParseStarterProjectActivity extends Activity
 	    {
 	        String name = dataCursor.getString(nameIdx);
 	        String number = dataCursor.getString(phoneIdx);
-	        //Log.i(DEBUG_TAG, method+": "+name+" ("+number+")");
+	        Log.i(DEBUG_TAG, method+": "+name+" ("+number+")");
 	        device_contacts.put(name,number);
 	    } 
 	    dataCursor.close();
@@ -416,7 +291,7 @@ public class ParseStarterProjectActivity extends Activity
 	 */
 	private void updateGui()
 	{
-		TextView status_text_view_label = (TextView)findViewById(R.id.status_text_view);
+		TextView status_text_view_label = (TextView)findViewById(R.id.hello_text_view);
 		if (foobie.equals("barbie"))
 		{
 			foobie = "Available";
@@ -435,8 +310,6 @@ public class ParseStarterProjectActivity extends Activity
 	public void updateStatusData()
 	{
 		final String method = "updateStatusData";
-		EditText status_edit_text = (EditText)findViewById(R.id.status_edit_text);
-    	foobie = status_edit_text.getText().toString().trim();
 		ParseQuery<ParseObject> query = ParseQuery.getQuery(TEST_OBJECT);
 		query.getInBackground(TEST_ID, new GetCallback<ParseObject>() {
 		  public void done(ParseObject test_object, ParseException e) {
@@ -490,10 +363,8 @@ public class ParseStarterProjectActivity extends Activity
 	            Log.e(DEBUG_TAG, "Creating tables because they doesn't exist yet." );
 	            // create table
 	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
-	            contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
-	            contacts_sqlite_db.execSQL(CREATE_GROUPS_TABLE);
-	            contacts_sqlite_db.execSQL(CREATE_CONTACTS_GROUPS_TABLE);
-	            // re-run query
+				contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
+	            // re-run query, etc.
 				first_time = true;
 				tryQuery(app_contacts, first_time);
 		    }
@@ -523,10 +394,9 @@ public class ParseStarterProjectActivity extends Activity
 			if (first_time)
 			{
 				insertAppContact(name, number);
-				Log.i(DEBUG_TAG, method+": first_time: insert row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
 			}
 			num_of_app_contacts++;
-			//Log.i(DEBUG_TAG, method+": row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
+			Log.i(DEBUG_TAG, method+": row "+c.getPosition()+": "+name+" "+number+" "+num_of_app_contacts);
 			c.moveToNext();
 		}
 	}
@@ -573,58 +443,11 @@ public class ParseStarterProjectActivity extends Activity
 	protected void onResume() 
 	{
 	    super.onResume();
-	    //setUpAppContactsCount();
+	    setupContactsCount();
 	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) 
-	{
-		super.onCreateOptionsMenu(menu);
-		menu.add(0 , reset_db_id, 0, R.string.reset_db);
-		return true;
-	}
-	
-	 public boolean onOptionsItemSelected(MenuItem item) 
-	 {
-	    String method = "onOptionsItemSelected";
-	    getIntent();
-	    if (item.getItemId() == reset_db_id)
-	    {
-	    	Log.i(DEBUG_TAG, method+": reset app db");
-	    	resetDB();
-	    }
-	    return super.onOptionsItemSelected(item);
-	 }
-	 
-	 private void resetDB()
-	 {
-		 String method = "resetDB";
-		 try
-		 {
-			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_contacts");
-			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_templates");
-			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_groups");
-			 contacts_sqlite_db.execSQL("DROP TABLE "+"tbl_contacts_groups");
-		 } catch ( android.database.sqlite.SQLiteException sqle)
-		 {
-			 Log.i(DEBUG_TAG, method+": error with dropping tables ");
-			 sqle.printStackTrace();
-		 }
-		 try
-		 {
-			 contacts_sqlite_db.execSQL(CREATE_CONTACTS_TABLE);
-			 contacts_sqlite_db.execSQL(CREATE_TEMPLATES_TABLE);
-			 contacts_sqlite_db.execSQL(CREATE_GROUPS_TABLE);
-			 contacts_sqlite_db.execSQL(CREATE_CONTACTS_GROUPS_TABLE);
-		 } catch ( android.database.sqlite.SQLiteException sqle)
-		 {
-			 Log.i(DEBUG_TAG, method+": error creating tables ");
-			 sqle.printStackTrace();
-		 }
-	 }
 	
 	// -------- UNUSED CODE -----------------------------------------------------
-	// Parse.com RESTful methods.
+	
 	/**
 	 * Dump all the columns and rows of a table.
 	 * @param c Cursor of a particular query to print.

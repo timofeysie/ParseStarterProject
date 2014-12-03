@@ -4,43 +4,12 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <ImageView
-            android:id="@+id/friends_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/friends_logo"
-            android:padding="10dp"
-            android:src="@drawable/ic_launcher" android:contentDescription="@string/friends"/>
-
-        <EditText
-            android:id="@+id/status_edit_text"
-            android:layout_width="103dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:ems="10"
-            android:inputType="text"
-            android:padding="10dp" />
-
-        <TextView
-            android:id="@+id/status_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/status_edit_text"
-            android:layout_toRightOf="@+id/friends_logo"
-            android:padding="10dp"
-            android:text="@string/status_text" />
-
-    </RelativeLayout>
+    
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:gravity="center" >
 
         <ImageView
             android:id="@+id/sync_image_button"
@@ -49,8 +18,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignTop="@+id/contacts_image_button"
             android:contentDescription="@string/sync_contacts"
-            android:padding="10dp"
             android:onClick="execute"
+            android:padding="10dp"
             android:src="@drawable/sync" />
 
         <ImageView
@@ -60,30 +29,9 @@
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/contacts_image_button"
             android:contentDescription="@string/templates"
-            android:padding="10dp"
             android:onClick="execute"
+            android:padding="10dp"
             android:src="@drawable/templates" />
-
-        <TextView
-            android:id="@+id/phone_contacts_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/new_sms_label"
-            android:layout_marginTop="23dp"
-            android:padding="10dp"
-            android:text="@string/phone_contacts" />
-
-        <TextView
-            android:id="@+id/app_contacts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/phone_contacts"
-            android:layout_alignBottom="@+id/phone_contacts"
-            android:layout_alignLeft="@+id/templates_label"
-            android:layout_marginLeft="28dp"
-            android:padding="10dp"
-            android:text="@string/_0" />
 
         <TextView
             android:id="@+id/templates_label"
@@ -113,8 +61,8 @@
             android:layout_above="@+id/templates_spinner_label"
             android:layout_centerHorizontal="true"
             android:contentDescription="@string/_contacts"
-            android:padding="10dp"
             android:onClick="execute"
+            android:padding="10dp"
             android:src="@drawable/contacts" />
 
         <ImageView
@@ -124,8 +72,8 @@
             android:layout_above="@+id/groups_button_label"
             android:layout_alignRight="@+id/groups_button_label"
             android:contentDescription="@string/groups"
-            android:padding="10dp"
             android:onClick="execute"
+            android:padding="10dp"
             android:src="@drawable/group" />
 
         <TextView
@@ -158,25 +106,6 @@
             android:text="@string/sync_with_contacts" />
 
         <TextView
-            android:id="@+id/phone_contacts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/sync_text_view"
-            android:layout_centerVertical="true"
-            android:padding="10dp"
-            android:text="@string/_0" />
-
-        <TextView
-            android:id="@+id/app_contacts_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/phone_contacts_label"
-            android:layout_alignBottom="@+id/phone_contacts_label"
-            android:layout_alignRight="@+id/groups_button_label"
-            android:padding="10dp"
-            android:text="@string/app_contacts" />
-
-        <TextView
             android:id="@+id/groups_button_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -186,13 +115,75 @@
             android:text="@string/groups" />
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/friends_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/new_sms_label"
-            android:layout_alignRight="@+id/templates_spinner_label"
-            android:contentDescription="@string/myra"
-            android:src="@drawable/myra1" />
+            android:layout_alignLeft="@+id/templates_spinner_label"
+            android:layout_alignTop="@+id/new_sms_image_button"
+            android:contentDescription="@string/friends"
+            android:padding="10dp"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/status_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/phone_contacts_label"
+            android:layout_alignBottom="@+id/phone_contacts_label"
+            android:layout_alignParentRight="true"
+            android:padding="10dp"
+            android:text="@string/status_text" />
+
+        <TextView
+            android:id="@+id/app_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/sync_image_button"
+            android:layout_below="@+id/app_contacts_label"
+            android:padding="10dp"
+            android:text="@string/_0" />
+
+        <TextView
+            android:id="@+id/app_contacts_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@+id/groups_button_label"
+            android:layout_marginTop="32dp"
+            android:padding="10dp"
+            android:text="@string/app_contacts" />
+
+        <TextView
+            android:id="@+id/phone_contacts_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/app_contacts_label"
+            android:layout_alignBottom="@+id/app_contacts_label"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="@string/phone_contacts" />
+
+        <TextView
+            android:id="@+id/phone_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/phone_contacts_label"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="@string/_0" />
+
+        <EditText
+            android:id="@+id/status_edit_text"
+            android:layout_width="103dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/groups_button_label"
+            android:ems="10"
+            android:inputType="text"
+            android:padding="10dp" >
+
+            <requestFocus />
+        </EditText>
 
     </RelativeLayout>
 

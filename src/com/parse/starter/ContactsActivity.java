@@ -1,7 +1,9 @@
 package com.parse.starter;
 
+import static org.curchod.util.Tables.contacts_sqlite_db;
+import static org.curchod.util.Tables.contacts_table;
+
 import java.util.ArrayList;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,7 +12,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -18,17 +19,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.TableLayout.LayoutParams;
 import android.widget.Toast;
-import static org.curchod.util.Tables.*;
 
 /**
  * Create a table of contacts.  The user can select a contact to delete.

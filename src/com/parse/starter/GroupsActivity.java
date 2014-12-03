@@ -1,5 +1,9 @@
 package com.parse.starter;
 
+import static org.curchod.util.Tables.contacts_sqlite_db;
+import static org.curchod.util.Tables.db_name;
+import static org.curchod.util.Tables.groups_table;
+
 import java.util.Locale;
 
 import android.app.Activity;
@@ -18,8 +22,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-
-import static org.curchod.util.Tables.*;
 
 public class GroupsActivity extends Activity 
 {

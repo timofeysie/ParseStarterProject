@@ -13,9 +13,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
+import android.widget.TableLayout.LayoutParams;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.TableLayout.LayoutParams;
 
 public class TemplatesActivity extends Activity 
 {
